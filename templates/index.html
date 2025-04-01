@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hochzeitstisch</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1 class="my-4 text-center">Hochzeitstisch</h1>
+        <button class="btn btn-info mb-4 w-100" type="button" data-toggle="collapse" data-target="#addGiftForm" aria-expanded="false" aria-controls="addGiftForm">
+            + Neues Geschenk hinzufügen
+        </button>
+        <div class="collapse" id="addGiftForm">
+            <form action="{{ url_for('add_gift') }}" method="POST" class="my-4" enctype="multipart/form-data">
+                <h2 class="text-center">Neues Geschenk hinzufügen</h2>
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="Was ist das Geschenk?" required>
+                </div>
+                <div class="form-group">
+                    <label for="link">Link zum Geschenk:</label>
+                    <input type="url" class="form-control" id="link" name="link" placeholder="Link zum Geschenk">
+                </div>
+                <div class="form-group">
+                    <label for="image">Bild:</label>
+                    <div class="input-group">
+                        <input type="url" class="form-control" id="image" name="image" placeholder="Bild URL">
+                        <div class="input-group-append">
+                            <span class="input-group-text">oder</span>
+                        </div>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="image_file" name="image_file" accept="image/*">
+                            <label class="custom-file-label" for="image_file">Bild hochladen</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group form-check">
+                    <input type="checkbox" class="form-check-input" id="splitGift" name="split_gift">
+                    <label class="form-check-label" for="splitGift">Möchtest Du dieses Geschenk aufteilen?</label>
+                </div>
+                <div id="priceFields" style="display: none;">
+                    <div class="form-group">
+                        <label for="price">Preis:</label>
+                        <input type="number" class="form-control" id="price" name="price" step="0.01">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success w-100">Hinzufügen</button>
+            </form>
+        </div>
+        <div class="row">
+            {% for gift in gifts %}
+            <div class="col-md-4">
+                <div class="card mb-4 shadow-sm">
+                    {% if gift.image %}
+                    <img src="{{ gift.image }}" class="card-img-top" alt="{{ gift.name }}">
+                    {% elif gift.image_file %}
+                    <img src="{{ url_for('static', filename='uploads/' + gift.image_file) }}" class="card-img-top" alt="{{ gift.name }}">
+                    {% else %}
+                    <img src="https://via.placeholder.com/150?text={{ gift.name }}" class="card-img-top" alt="{{ gift.name }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ gift.name }}</h5>
+                        <p class="card-text">Preis: {{ gift.price }} €</p>
+                        <p class="card-text">Gesammelt: {{ gift.collected_amount }} €</p>
+                        <form action="{{ url_for('contribute', gift_id=gift.id) }}" method="POST">
+                            <div class="form-group">
+                                <label for="amount">Betrag:</label>
+                                <input type="number" class="form-control" id="amount" name="amount" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Beitragen</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.getElementById('splitGift').addEventListener('change', function() {
+            var priceFields = document.getElementById('priceFields');
+            if (this.checked) {
+                priceFields.style.display = 'block';
+            } else {
+                priceFields.style.display = 'none';
+            }
+        });
+
+        document.querySelector('.custom-file-input').addEventListener('change', function(e) {
+            var fileName = document.getElementById("image_file").files[0].name;
+            var nextSibling = e.target.nextElementSibling;
+            nextSibling.innerText = fileName;
+        });
+    </script>
+</body>
+</html>
