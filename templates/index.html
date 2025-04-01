@@ -58,8 +58,6 @@
                     <img src="{{ gift.image }}" class="card-img-top" alt="{{ gift.name }}">
                     {% elif gift.image_file %}
                     <img src="{{ url_for('static', filename='uploads/' + gift.image_file) }}" class="card-img-top" alt="{{ gift.name }}">
-                    {% else %}
-                    <img src="https://via.placeholder.com/150?text={{ gift.name }}" class="card-img-top" alt="{{ gift.name }}">
                     {% endif %}
                     <div class="card-body">
                         <h5 class="card-title">{{ gift.name }}</h5>

@@ -70,8 +70,20 @@ def upgrade_db():
         if hasattr(Gift, 'total_amount'):
             db.engine.execute('ALTER TABLE gift DROP COLUMN total_amount')
 
-if __name__ == '__main__':
-    upgrade_db()
+# Initialize the app
+def init_app():
+    # Ensure upload directory exists
+    os.makedirs(os.path.join(os.path.dirname(os.path.abspath(__file__)), 
+                            app.config['UPLOAD_FOLDER']), exist_ok=True)
+    
     with app.app_context():
+        upgrade_db()
         db.create_all()
+    
+    return app
+
+if __name__ == '__main__':
+    init_app()
     app.run(debug=True)
+else:
+    init_app()
